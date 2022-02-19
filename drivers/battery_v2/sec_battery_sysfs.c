@@ -46,6 +46,7 @@ static struct device_attribute sec_battery_attrs[] = {
 
 	SEC_BATTERY_ATTR(batt_vf_adc),
 	SEC_BATTERY_ATTR(batt_slate_mode),
+	SEC_BATTERY_ATTR(batt_idle_mode),
 
 	SEC_BATTERY_ATTR(batt_lp_charging),
 	SEC_BATTERY_ATTR(siop_activated),
@@ -394,7 +395,6 @@ ssize_t sec_bat_show_attrs(struct device *dev,
 		i += scnprintf(buf + i, PAGE_SIZE - i, "%d\n",
 			is_slate_mode(battery));
 		break;
-
 	case BATT_IDLE_MODE:
 		i += scnprintf(buf + i, PAGE_SIZE - i, "%d\n",
 			is_idle_mode(battery));
