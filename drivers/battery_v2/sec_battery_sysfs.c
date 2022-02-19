@@ -395,6 +395,11 @@ ssize_t sec_bat_show_attrs(struct device *dev,
 			is_slate_mode(battery));
 		break;
 
+	case BATT_IDLE_MODE:
+		i += scnprintf(buf + i, PAGE_SIZE - i, "%d\n",
+			is_idle_mode(battery));
+		break;
+
 	case BATT_LP_CHARGING:
 		if (lpcharge) {
 			i += scnprintf(buf + i, PAGE_SIZE - i, "%d\n",
@@ -1295,6 +1300,34 @@ ssize_t sec_bat_store_attrs(
 			queue_delayed_work(battery->monitor_wqueue,
 					   &battery->cable_work, 0);
 			ret = count;
+		}
+		break;
+	case BATT_IDLE_MODE:
+		if (sscanf(buf, "%10d\n", &x) == 1) {
+			if (x == 1) {
+				battery->status = POWER_SUPPLY_STATUS_DISCHARGING;
+				sec_bat_set_charge(battery, SEC_BAT_CHG_MODE_CHARGING_OFF);
+				wake_lock(&battery->cable_wake_lock);
+				queue_delayed_work(battery->monitor_wqueue,
+					   &battery->cable_work, 0);
+				dev_info(battery->dev,
+					"%s: enable slate mode : %d\n", __func__, x);
+			} else if (x == 0) {
+				battery->status = POWER_SUPPLY_STATUS_CHARGING;
+				sec_bat_set_charge(battery, SEC_BAT_CHG_MODE_CHARGING);
+				wake_lock(&battery->cable_wake_lock);
+				queue_delayed_work(battery->monitor_wqueue,
+					   &battery->cable_work, 0);
+				dev_info(battery->dev,
+					"%s: disable slate mode : %d\n", __func__, x);
+			} else {
+				dev_info(battery->dev,
+					"%s: SLATE MODE unknown command\n", __func__);
+				return -EINVAL;
+			}
+			wake_lock(&battery->cable_wake_lock);
+			queue_delayed_work(battery->monitor_wqueue,
+					   &battery->cable_work, 0);
 		}
 		break;
 	case BATT_LP_CHARGING:
