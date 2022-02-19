@@ -1147,4 +1147,6 @@ static inline struct power_supply *get_power_supply_by_name(char *name)
 
 #define is_slate_mode(battery) ((battery->current_event & SEC_BAT_CURRENT_EVENT_SLATE) \
 			== SEC_BAT_CURRENT_EVENT_SLATE)
+
+#define is_slate_mode(battery) (battery->status == POWER_SUPPLY_STATUS_DISCHARGING;)
 #endif /* __SEC_CHARGING_COMMON_H */
